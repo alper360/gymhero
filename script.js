@@ -175,6 +175,7 @@ nextSetBtn.addEventListener("click", () => {
         nextSetBtn.classList.add("btn-danger");
     }
 
+    // Timer für JEDEN Satz außer dem letzten Satz
     if (currentSet < exercise.sets) {
         let timeLeft = exercise.rest_time;
         timerContainer.classList.remove("d-none");
@@ -182,7 +183,6 @@ nextSetBtn.addEventListener("click", () => {
         
         if (currentTimer) {
             clearInterval(currentTimer);
-            currentTimer = null;
         }
         
         currentTimer = setInterval(() => {
@@ -196,7 +196,7 @@ nextSetBtn.addEventListener("click", () => {
             timerDisplay.textContent = formatTime(timeLeft);
         }, 1000);
     } else {
-        // Timer ausblenden wenn letzter Satz erreicht
+        // Letzter Satz: Timer ausblenden
         timerContainer.classList.add("d-none");
     }
 });
