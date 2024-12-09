@@ -80,37 +80,6 @@ document.getElementById("start-training").addEventListener("click", () => {
     exerciseContainer.classList.remove("d-none");
 });
 
-nextSetBtn.addEventListener("click", () => {
-    const exercise = currentTrainingDay[currentExerciseIndex];
-    if (currentSet >= exercise.sets) {
-        alert("Übung abgeschlossen!");
-        nextExercise();
-        return;
-    }
-
-    currentSet++;
-    currentSetDisplay.textContent = currentSet;
-    
-    timerContainer.classList.remove("d-none");
-    let timeLeft = exercise.rest_time;
-    timerDisplay.textContent = formatTime(timeLeft);
-    
-    if (currentTimer) {
-        clearInterval(currentTimer);
-    }
-    
-    currentTimer = setInterval(() => {
-        timeLeft--;
-        if (timeLeft < 0) {
-            clearInterval(currentTimer);
-            timerDisplay.textContent = "Pause beendet!";
-            alert("Weiter zum nächsten Satz!");
-            return;
-        }
-        timerDisplay.textContent = formatTime(timeLeft);
-    }, 1000);
-});
-
 function nextExercise() {
     if (currentExerciseIndex >= 0) {
         const currentExerciseName = currentTrainingDay[currentExerciseIndex].name;
@@ -134,6 +103,37 @@ function nextExercise() {
     currentSetDisplay.textContent = currentSet;
     weightInput.value = getLastWeight(exercise.name);
 }
+
+nextSetBtn.addEventListener("click", () => {
+    const exercise = currentTrainingDay[currentExerciseIndex];
+    if (currentSet >= exercise.sets) {
+        alert("Übung abgeschlossen!");
+        nextExercise();
+        return;
+    }
+
+    currentSet++;
+    currentSetDisplay.textContent = currentSet;
+    
+    if (currentTimer) {
+        clearInterval(currentTimer);
+    }
+    
+    let timeLeft = exercise.rest_time;
+    timerContainer.classList.remove("d-none");
+    timerDisplay.textContent = formatTime(timeLeft);
+    
+    currentTimer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft < 0) {
+            clearInterval(currentTimer);
+            timerDisplay.textContent = "Pause beendet!";
+            alert("Weiter zum nächsten Satz!");
+            return;
+        }
+        timerDisplay.textContent = formatTime(timeLeft);
+    }, 1000);
+});
 
 async function saveProgress(exerciseName, weight) {
     const currentDate = new Date();
@@ -167,6 +167,9 @@ async function loadProgress() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             trackedWeights = docSnap.data().trackedWeights;
+            if (!trackedWeights.entries) {
+                trackedWeights.entries = [];
+            }
             updateProgressList();
         }
     } catch (error) {
@@ -200,7 +203,10 @@ function updateProgressList() {
 async function deleteEntry(id) {
     trackedWeights.entries = trackedWeights.entries.filter(entry => entry.id !== id);
     try {
-        await saveProgress();
+        await setDoc(doc(db, "workouts", "user1"), {
+            trackedWeights: trackedWeights,
+            lastUpdated: new Date()
+        });
         updateProgressList();
     } catch (error) {
         console.error("Fehler beim Löschen:", error);
