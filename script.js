@@ -24,7 +24,7 @@ const trainingDays = {
         { name: "Dips", sets: 3, reps: "10", rest_time: 120 }
     ],
     Pull: [
-        { name: "Lat-Ziehen (Kabelzug)", sets: 3, reps: "10", rest_time: 180 },
+        { name: "Lat-Ziehen (Kabelzug)", sets: 3, reps: "10", rest_time: 120 },
         { name: "Rudern (Kabelzug)", sets: 3, reps: "10", rest_time: 120 },
         { name: "Überzüge (Maschine / Kabelzug)", sets: 3, reps: "10", rest_time: 120 },
         { name: "Face Pulls (Kabelzug)", sets: 3, reps: "10", rest_time: 120 },
