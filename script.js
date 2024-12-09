@@ -33,6 +33,25 @@ const trainingDays = {
     ]
 };
 
+let currentTrainingDay = [];
+let currentExerciseIndex = -1;
+let currentSet = 0;
+let currentTimer = null;
+let trackedWeights = { entries: [] };
+
+// DOM-Elemente
+const exerciseContainer = document.getElementById("exercise-container");
+const exerciseName = document.getElementById("exercise-name");
+const totalSets = document.getElementById("total-sets");
+const reps = document.getElementById("reps");
+const restTime = document.getElementById("rest-time");
+const currentSetDisplay = document.getElementById("current-set");
+const nextSetBtn = document.getElementById("next-set-btn");
+const timerContainer = document.getElementById("timer-container");
+const timerDisplay = document.getElementById("timer-display");
+const weightInput = document.getElementById("weight-input");
+const progressList = document.getElementById("progress-list");
+
 document.getElementById("training-day").addEventListener("change", updateProgressList);
 
 document.getElementById("start-training").addEventListener("click", () => {
@@ -117,6 +136,36 @@ nextSetBtn.addEventListener("click", () => {
     }
 });
 
+function saveProgress(exerciseName, weight) {
+    const currentDate = new Date();
+    const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+    const formattedDate = `${days[currentDate.getDay()]}, ${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear().toString().slice(-2)}`;
+    
+    const entry = {
+        trainingDay: document.getElementById("training-day").value,
+        date: formattedDate,
+        exercise: exerciseName,
+        weight: weight,
+        id: Date.now()
+    };
+    
+    if (!trackedWeights.entries) {
+        trackedWeights.entries = [];
+    }
+    
+    trackedWeights.entries.unshift(entry);
+    localStorage.setItem('trackedWeights', JSON.stringify(trackedWeights));
+    updateProgressList();
+}
+
+function loadProgress() {
+    const saved = localStorage.getItem('trackedWeights');
+    if (saved) {
+        trackedWeights = JSON.parse(saved);
+        updateProgressList();
+    }
+}
+
 function updateProgressList() {
     const selectedDay = document.getElementById("training-day").value;
     progressList.innerHTML = "";
@@ -146,10 +195,10 @@ function updateProgressList() {
         });
 }
 
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+function deleteEntry(id) {
+    trackedWeights.entries = trackedWeights.entries.filter(entry => entry.id !== id);
+    localStorage.setItem('trackedWeights', JSON.stringify(trackedWeights));
+    updateProgressList();
 }
 
 function getLastWeight(exerciseName) {
@@ -158,3 +207,13 @@ function getLastWeight(exerciseName) {
         .filter(entry => entry.trainingDay === selectedDay && entry.exercise === exerciseName)[0];
     return lastEntry ? lastEntry.weight : "- kg";
 }
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadProgress();
+});
