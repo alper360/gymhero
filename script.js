@@ -1,3 +1,19 @@
+// Firebase Initialisierung
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCcHR9c7AR3V--lAJVyAWBEThAc0ffG3O4",
+    authDomain: "gymhero-abee7.firebaseapp.com",
+    projectId: "gymhero-abee7",
+    storageBucket: "gymhero-abee7.firebasestorage.app",
+    messagingSenderId: "1008301754178",
+    appId: "1:1008301754178:web:9b84bd3d485a3455f96adb"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 // Vollständiger Trainingsplan
 const trainingDays = {
     Push: [
@@ -52,22 +68,6 @@ const timerContainer = document.getElementById("timer-container");
 const timerDisplay = document.getElementById("timer-display");
 const weightInput = document.getElementById("weight-input");
 const progressList = document.getElementById("progress-list");
-
-// Firebase Initialisierung
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
-
-const firebaseConfig = {
-    apiKey: "AIzaSyCcHR9c7AR3V--lAJVyAWBEThAc0ffG3O4",
-    authDomain: "gymhero-abee7.firebaseapp.com",
-    projectId: "gymhero-abee7",
-    storageBucket: "gymhero-abee7.firebasestorage.app",
-    messagingSenderId: "1008301754178",
-    appId: "1:1008301754178:web:9b84bd3d485a3455f96adb"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 // Event Listener für Trainingsstart
 document.getElementById("start-training").addEventListener("click", () => {
