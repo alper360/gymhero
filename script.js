@@ -106,7 +106,7 @@ function nextExercise() {
     timerContainer.classList.add("d-none");
     
     // Button Text zurücksetzen
-    nextSetBtn.textContent = "Satz abschließen";
+    nextSetBtn.textContent = "Satz abschliessen";
     nextSetBtn.classList.remove("btn-danger");
     nextSetBtn.classList.add("btn-success");
 }
