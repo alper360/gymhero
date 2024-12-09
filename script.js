@@ -75,12 +75,12 @@ exerciseContainer.insertBefore(progressBar, exerciseName);
 
 function updateExerciseProgress() {
     const progressBar = document.getElementById("exercise-progress");
-    progressBar.innerHTML = currentTrainingDay.map((exercise, index) => {
-        if (index === currentExerciseIndex) {
-            return `<strong>${exercise.name}</strong>`;
-        }
-        return exercise.name;
-    }).join(" > ");
+progressBar.innerHTML = currentTrainingDay.map((exercise, index) => {
+    if (index === currentExerciseIndex) {
+        return `<span style="margin: 0 3px">${exercise.name}</span>`;
+    }
+    return `<span style="margin: 0 3px">${exercise.name}</span>`;
+}).join('<span style="margin: 0 3px">></span>');
 }
 
 document.getElementById("training-day").addEventListener("change", updateProgressList);
