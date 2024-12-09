@@ -51,7 +51,7 @@ const trainingDays = {
 
 let currentTrainingDay = [];
 let currentExerciseIndex = -1;
-let currentSet = -1;
+let currentSet = 0;
 let trackedWeights = { entries: [] };
 
 const exerciseContainer = document.getElementById("exercise-container");
@@ -66,7 +66,6 @@ const timerDisplay = document.getElementById("timer-display");
 const weightInput = document.getElementById("weight-input");
 const progressList = document.getElementById("progress-list");
 
-// Event Listener für Trainingstag-Änderung
 document.getElementById("training-day").addEventListener("change", updateProgressList);
 
 document.getElementById("start-training").addEventListener("click", () => {
@@ -77,7 +76,7 @@ document.getElementById("start-training").addEventListener("click", () => {
     }
     currentTrainingDay = trainingDays[selectedDay];
     currentExerciseIndex = -1;
-    currentSet = -1;
+    currentSet = 0;
     nextExercise();
     exerciseContainer.classList.remove("d-none");
 });
@@ -104,32 +103,34 @@ function nextExercise() {
     currentSet = 1;
     currentSetDisplay.textContent = currentSet;
     weightInput.value = getLastWeight(exercise.name);
+    timerContainer.classList.add("d-none");
 }
 
 nextSetBtn.addEventListener("click", () => {
     const exercise = currentTrainingDay[currentExerciseIndex];
+    
     if (currentSet >= exercise.sets) {
         alert("Übung abgeschlossen!");
         nextExercise();
         return;
     }
 
-    currentSet++;
-    currentSetDisplay.textContent = currentSet;
+    // Timer starten nach Satzabschluss
+    let timeLeft = exercise.rest_time;
+    timerContainer.classList.remove("d-none");
+    timerDisplay.textContent = formatTime(timeLeft);
     
     if (currentTimer) {
         clearInterval(currentTimer);
     }
-    
-    let timeLeft = exercise.rest_time;
-    timerContainer.classList.remove("d-none");
-    timerDisplay.textContent = formatTime(timeLeft);
     
     currentTimer = setInterval(() => {
         timeLeft--;
         if (timeLeft < 0) {
             clearInterval(currentTimer);
             timerDisplay.textContent = "Pause beendet!";
+            currentSet++;
+            currentSetDisplay.textContent = currentSet;
             alert("Weiter zum nächsten Satz!");
             return;
         }
@@ -194,7 +195,7 @@ function updateProgressList() {
             contentDiv.innerHTML = `
                 <strong>${entry.date}</strong><br>
                 ${entry.exercise}: ${entry.weight}${entry.weight !== '- kg' ? ' kg' : ''}
-                `;
+            `;
             
             const deleteButton = document.createElement("button");
             deleteButton.className = "btn btn-danger btn-sm";
