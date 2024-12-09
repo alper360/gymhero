@@ -1,6 +1,4 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
+// Firebase Konfiguration
 const firebaseConfig = {
     apiKey: "AIzaSyCcHR9c7AR3V--lAJVyAWBEThAc0ffG3O4",
     authDomain: "gymhero-abee7.firebaseapp.com",
@@ -10,8 +8,9 @@ const firebaseConfig = {
     appId: "1:1008301754178:web:9b84bd3d485a3455f96adb"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Firebase initialisieren
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 let currentTimer = null;
 
@@ -151,7 +150,7 @@ async function saveProgress(exerciseName, weight) {
     trackedWeights.entries.unshift(entry);
     
     try {
-        await setDoc(doc(db, "workouts", "user1"), {
+        await db.collection('workouts').doc('user1').set({
             trackedWeights: trackedWeights,
             lastUpdated: new Date()
         });
@@ -163,10 +162,9 @@ async function saveProgress(exerciseName, weight) {
 
 async function loadProgress() {
     try {
-        const docRef = doc(db, "workouts", "user1");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            trackedWeights = docSnap.data().trackedWeights;
+        const doc = await db.collection('workouts').doc('user1').get();
+        if (doc.exists) {
+            trackedWeights = doc.data().trackedWeights;
             if (!trackedWeights.entries) {
                 trackedWeights.entries = [];
             }
@@ -203,7 +201,7 @@ function updateProgressList() {
 async function deleteEntry(id) {
     trackedWeights.entries = trackedWeights.entries.filter(entry => entry.id !== id);
     try {
-        await setDoc(doc(db, "workouts", "user1"), {
+        await db.collection('workouts').doc('user1').set({
             trackedWeights: trackedWeights,
             lastUpdated: new Date()
         });
