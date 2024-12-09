@@ -182,6 +182,7 @@ nextSetBtn.addEventListener("click", () => {
         
         if (currentTimer) {
             clearInterval(currentTimer);
+            currentTimer = null;
         }
         
         currentTimer = setInterval(() => {
@@ -189,12 +190,16 @@ nextSetBtn.addEventListener("click", () => {
             if (timeLeft < 0) {
                 clearInterval(currentTimer);
                 timerDisplay.textContent = "Pause beendet!";
-                currentTimer = null;  // Timer zurücksetzen
+                currentTimer = null;
                 return;
             }
             timerDisplay.textContent = formatTime(timeLeft);
         }, 1000);
+    } else {
+        // Timer ausblenden wenn letzter Satz erreicht
+        timerContainer.classList.add("d-none");
     }
+});
 });
 
 async function saveProgress(exerciseName, weight) {
