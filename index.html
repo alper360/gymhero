@@ -11,26 +11,15 @@
         import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     </script>
     <style>
-        body {
-            font-size: 16px;
-        }
-        .current-set {
-            font-weight: bold;
-            color: #007bff;
-        }
-        #timer-display {
-            font-size: 3rem;
-            font-weight: bold;
-        }
-        .exercise-card {
-            margin-top: 20px;
-        }
+        body { font-size: 16px; }
+        .current-set { font-weight: bold; color: #007bff; }
+        #timer-display { font-size: 3rem; font-weight: bold; }
+        .exercise-card { margin-top: 20px; }
     </style>
 </head>
 <body class="container mt-3">
     <h1 class="text-center mb-4">Workout Tracker</h1>
 
-    <!-- Trainingstag-Auswahl -->
     <div class="mb-4">
         <label for="training-day" class="form-label">Wähle deinen Trainingstag:</label>
         <select id="training-day" class="form-select">
@@ -43,7 +32,6 @@
         <button id="start-training" class="btn btn-primary mt-3">Training starten</button>
     </div>
 
-    <!-- Aktuelle Übung -->
     <div id="exercise-container" class="card p-3 d-none exercise-card">
         <h2 id="exercise-name" class="card-title"></h2>
         <p><strong>Sätze:</strong> <span id="total-sets"></span></p>
@@ -51,29 +39,24 @@
         <p><strong>Satzpause:</strong> <span id="rest-time"></span></p>
         <p><strong>Aktueller Satz:</strong> <span id="current-set" class="current-set"></span></p>
 
-        <!-- Gewicht eingeben -->
         <div class="mb-3">
             <label for="weight-input" class="form-label">Gewicht (kg):</label>
             <input type="number" id="weight-input" class="form-control" placeholder="Gib das Gewicht ein">
         </div>
 
-        <!-- Nächster Satz Button -->
         <button id="next-set-btn" class="btn btn-success mt-3">Nächster Satz</button>
     </div>
 
-    <!-- Timer -->
     <div id="timer-container" class="mt-4 text-center d-none">
         <h2>Satzpause Timer</h2>
         <div id="timer-display">00:00</div>
     </div>
 
-    <!-- Fortschrittsliste -->
     <div class="mt-4">
         <h3>Fortschritt</h3>
         <ul id="progress-list" class="list-group"></ul>
     </div>
 
-    <!-- JavaScript -->
     <script type="module" src="script.js"></script>
 </body>
 </html>
