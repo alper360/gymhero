@@ -1,17 +1,16 @@
-// Firebase Konfiguration
-const firebaseConfig = {
-    apiKey: "AIzaSyCcHR9c7AR3V--lAJVyAWBEThAc0ffG3O4",
-    authDomain: "gymhero-abee7.firebaseapp.com",
-    projectId: "gymhero-abee7",
-    storageBucket: "gymhero-abee7.firebasestorage.app",
-    messagingSenderId: "1008301754178",
-    appId: "1:1008301754178:web:9b84bd3d485a3455f96adb"
-};
+// Firebase Konfiguration 
+const firebaseConfig = { 
+    apiKey: "AIzaSyCcHR9c7AR3V--lAJVyAWBEThAc0ffG3O4", 
+    authDomain: "gymhero-abee7.firebaseapp.com", 
+    projectId: "gymhero-abee7", 
+    storageBucket: "gymhero-abee7.firebasestorage.app", 
+    messagingSenderId: "1008301754178", 
+    appId: "1:1008301754178:web:9b84bd3d485a3455f96adb" 
+}; 
 
 // Firebase initialisieren
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
 let currentTimer = null;
 
 const trainingDays = {
@@ -86,15 +85,12 @@ function nextExercise() {
         const currentExerciseName = currentTrainingDay[currentExerciseIndex].name;
         saveProgress(currentExerciseName, weightInput.value || "- kg");
     }
-
     currentExerciseIndex++;
     if (currentExerciseIndex >= currentTrainingDay.length) {
-        alert("Training abgeschlossen!");
         exerciseContainer.classList.add("d-none");
         timerContainer.classList.add("d-none");
         return;
     }
-
     const exercise = currentTrainingDay[currentExerciseIndex];
     exerciseName.textContent = exercise.name;
     totalSets.textContent = exercise.sets;
@@ -104,8 +100,6 @@ function nextExercise() {
     currentSetDisplay.textContent = currentSet;
     weightInput.value = getLastWeight(exercise.name);
     timerContainer.classList.add("d-none");
-    
-    // Button Text zurücksetzen
     nextSetBtn.textContent = "Satz abschliessen";
     nextSetBtn.classList.remove("btn-danger");
     nextSetBtn.classList.add("btn-success");
@@ -113,39 +107,31 @@ function nextExercise() {
 
 nextSetBtn.addEventListener("click", () => {
     const exercise = currentTrainingDay[currentExerciseIndex];
-    
     if (currentSet >= exercise.sets) {
-        alert("Übung abgeschlossen!");
         nextExercise();
         return;
     }
-
     currentSet++;
     currentSetDisplay.textContent = currentSet;
-    
-    // Button Text und Style für letzten Satz ändern
+
     if (currentSet === exercise.sets) {
         nextSetBtn.textContent = "Nächste Übung";
         nextSetBtn.classList.remove("btn-success");
         nextSetBtn.classList.add("btn-danger");
     }
 
-    // Timer nur starten, wenn nicht der letzte Satz war
     if (currentSet < exercise.sets) {
         let timeLeft = exercise.rest_time;
         timerContainer.classList.remove("d-none");
         timerDisplay.textContent = formatTime(timeLeft);
-        
         if (currentTimer) {
             clearInterval(currentTimer);
         }
-        
         currentTimer = setInterval(() => {
             timeLeft--;
             if (timeLeft < 0) {
                 clearInterval(currentTimer);
                 timerDisplay.textContent = "Pause beendet!";
-                alert("Weiter zum nächsten Satz!");
                 return;
             }
             timerDisplay.textContent = formatTime(timeLeft);
@@ -160,7 +146,7 @@ async function saveProgress(exerciseName, weight) {
     const minutes = currentDate.getMinutes().toString().padStart(2, '0');
     const timeString = `${hours}:${minutes}`;
     const formattedDate = `${days[currentDate.getDay()]}, ${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear().toString().slice(-2)}`;
-    
+
     const entry = {
         trainingDay: document.getElementById("training-day").value,
         date: formattedDate,
@@ -169,9 +155,9 @@ async function saveProgress(exerciseName, weight) {
         weight: weight,
         id: Date.now()
     };
-    
+
     trackedWeights.entries.unshift(entry);
-    
+
     try {
         await db.collection('workouts').doc('user1').set({
             trackedWeights: trackedWeights,
@@ -202,23 +188,24 @@ function updateProgressList() {
     const selectedDay = document.getElementById("training-day").value;
     progressList.innerHTML = "";
     if (!selectedDay) return;
-    
+
     trackedWeights.entries
         .filter(entry => entry.trainingDay === selectedDay)
         .forEach(entry => {
             const listItem = document.createElement("li");
             listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            
             const contentDiv = document.createElement("div");
             contentDiv.innerHTML = `
                 ${entry.date} - ${entry.time} Uhr<br>
                 ${entry.exercise}: ${entry.weight}${entry.weight !== '- kg' ? ' kg' : ''}
             `;
-            
+
             const deleteButton = document.createElement("button");
             deleteButton.className = "btn btn-danger btn-sm";
             deleteButton.innerHTML = "×";
             deleteButton.onclick = () => deleteEntry(entry.id);
-            
+
             listItem.appendChild(contentDiv);
             listItem.appendChild(deleteButton);
             progressList.appendChild(listItem);
