@@ -1,19 +1,3 @@
-// Firebase Konfiguration
-const firebaseConfig = {
-    apiKey: "AIzaSyCcHR9c7AR3V--lAJVyAWBEThAc0ffG3O4",
-    authDomain: "gymhero-abee7.firebaseapp.com",
-    projectId: "gymhero-abee7",
-    storageBucket: "gymhero-abee7.firebasestorage.app",
-    messagingSenderId: "1008301754178",
-    appId: "1:1008301754178:web:9b84bd3d485a3455f96adb"
-};
-
-// Firebase initialisieren
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-let currentTimer = null;
-
 const trainingDays = {
     Push: [
         { name: "Bankdrücken (KH)", sets: 3, reps: "8", rest_time: 120 },
@@ -48,23 +32,6 @@ const trainingDays = {
         { name: "Hammer Curls", sets: 3, reps: "10", rest_time: 90 }
     ]
 };
-
-let currentTrainingDay = [];
-let currentExerciseIndex = -1;
-let currentSet = 0;
-let trackedWeights = { entries: [] };
-
-const exerciseContainer = document.getElementById("exercise-container");
-const exerciseName = document.getElementById("exercise-name");
-const totalSets = document.getElementById("total-sets");
-const reps = document.getElementById("reps");
-const restTime = document.getElementById("rest-time");
-const currentSetDisplay = document.getElementById("current-set");
-const nextSetBtn = document.getElementById("next-set-btn");
-const timerContainer = document.getElementById("timer-container");
-const timerDisplay = document.getElementById("timer-display");
-const weightInput = document.getElementById("weight-input");
-const progressList = document.getElementById("progress-list");
 
 document.getElementById("training-day").addEventListener("change", updateProgressList);
 
@@ -105,8 +72,7 @@ function nextExercise() {
     weightInput.value = getLastWeight(exercise.name);
     timerContainer.classList.add("d-none");
     
-    // Button Text zurücksetzen
-    nextSetBtn.textContent = "Satz abschliessen";
+    nextSetBtn.textContent = "Satz abschließen";
     nextSetBtn.classList.remove("btn-danger");
     nextSetBtn.classList.add("btn-success");
 }
@@ -123,14 +89,12 @@ nextSetBtn.addEventListener("click", () => {
     currentSet++;
     currentSetDisplay.textContent = currentSet;
     
-    // Button Text und Style für letzten Satz ändern
     if (currentSet === exercise.sets) {
         nextSetBtn.textContent = "Nächste Übung";
         nextSetBtn.classList.remove("btn-success");
         nextSetBtn.classList.add("btn-danger");
     }
 
-    // Timer nur starten, wenn nicht der letzte Satz war
     if (currentSet < exercise.sets) {
         let timeLeft = exercise.rest_time;
         timerContainer.classList.remove("d-none");
@@ -152,47 +116,6 @@ nextSetBtn.addEventListener("click", () => {
         }, 1000);
     }
 });
-
-async function saveProgress(exerciseName, weight) {
-    const currentDate = new Date();
-    const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-    const formattedDate = `${days[currentDate.getDay()]}, ${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear().toString().slice(-2)}`;
-    
-    const entry = {
-        trainingDay: document.getElementById("training-day").value,
-        date: formattedDate,
-        exercise: exerciseName,
-        weight: weight,
-        id: Date.now()
-    };
-    
-    trackedWeights.entries.unshift(entry);
-    
-    try {
-        await db.collection('workouts').doc('user1').set({
-            trackedWeights: trackedWeights,
-            lastUpdated: new Date()
-        });
-        updateProgressList();
-    } catch (error) {
-        console.error("Fehler beim Speichern:", error);
-    }
-}
-
-async function loadProgress() {
-    try {
-        const doc = await db.collection('workouts').doc('user1').get();
-        if (doc.exists) {
-            trackedWeights = doc.data().trackedWeights;
-            if (!trackedWeights.entries) {
-                trackedWeights.entries = [];
-            }
-            updateProgressList();
-        }
-    } catch (error) {
-        console.error("Fehler beim Laden:", error);
-    }
-}
 
 function updateProgressList() {
     const selectedDay = document.getElementById("training-day").value;
@@ -223,17 +146,10 @@ function updateProgressList() {
         });
 }
 
-async function deleteEntry(id) {
-    trackedWeights.entries = trackedWeights.entries.filter(entry => entry.id !== id);
-    try {
-        await db.collection('workouts').doc('user1').set({
-            trackedWeights: trackedWeights,
-            lastUpdated: new Date()
-        });
-        updateProgressList();
-    } catch (error) {
-        console.error("Fehler beim Löschen:", error);
-    }
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
 function getLastWeight(exerciseName) {
@@ -242,13 +158,3 @@ function getLastWeight(exerciseName) {
         .filter(entry => entry.trainingDay === selectedDay && entry.exercise === exerciseName)[0];
     return lastEntry ? lastEntry.weight : "- kg";
 }
-
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    loadProgress();
-});
