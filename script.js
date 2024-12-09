@@ -193,8 +193,8 @@ function updateProgressList() {
             const contentDiv = document.createElement("div");
             contentDiv.innerHTML = `
                 <strong>${entry.date}</strong><br>
-                ${entry.exercise}: ${entry.weight}
-            `;
+                ${entry.exercise}: ${entry.weight}${entry.weight !== '- kg' ? ' kg' : ''}
+                `;
             
             const deleteButton = document.createElement("button");
             deleteButton.className = "btn btn-danger btn-sm";
