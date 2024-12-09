@@ -70,17 +70,17 @@ const nextExerciseBtn = document.getElementById("next-exercise-btn");
 // Neues Element für die Übungsnavigation
 const progressBar = document.createElement("div");
 progressBar.id = "exercise-progress";
-progressBar.style.cssText = "font-size: 0.8em; margin-bottom: 10px; white-space: nowrap; overflow-x: auto;";
+progressBar.style.cssText = "font-size: 0.8em; margin-bottom: 5px; white-space: nowrap; overflow-x: auto;";
 exerciseContainer.insertBefore(progressBar, exerciseName);
 
 function updateExerciseProgress() {
     const progressBar = document.getElementById("exercise-progress");
-progressBar.innerHTML = currentTrainingDay.map((exercise, index) => {
-    if (index === currentExerciseIndex) {
-        return `<span style="margin: 0 3px">${exercise.name}</span>`;
-    }
-    return `<span style="margin: 0 3px">${exercise.name}</span>`;
-}).join('<span style="margin: 0 3px">></span>');
+    progressBar.innerHTML = currentTrainingDay.map((exercise, index) => {
+        if (index === currentExerciseIndex) {
+            return `<strong>${exercise.name}</strong>`;
+        }
+        return exercise.name;
+    }).join(" > ");
 }
 
 document.getElementById("training-day").addEventListener("change", updateProgressList);
