@@ -120,35 +120,37 @@ nextSetBtn.addEventListener("click", () => {
         return;
     }
 
-    // Timer starten nach Satzabschluss
-    let timeLeft = exercise.rest_time;
-    timerContainer.classList.remove("d-none");
-    timerDisplay.textContent = formatTime(timeLeft);
+    currentSet++;
+    currentSetDisplay.textContent = currentSet;
     
-    if (currentTimer) {
-        clearInterval(currentTimer);
+    // Button Text und Style für letzten Satz ändern
+    if (currentSet === exercise.sets) {
+        nextSetBtn.textContent = "Nächste Übung";
+        nextSetBtn.classList.remove("btn-success");
+        nextSetBtn.classList.add("btn-danger");
     }
-    
-    currentTimer = setInterval(() => {
-        timeLeft--;
-        if (timeLeft < 0) {
-            clearInterval(currentTimer);
-            timerDisplay.textContent = "Pause beendet!";
-            currentSet++;
-            currentSetDisplay.textContent = currentSet;
-            
-            // Button Text und Style für letzten Satz ändern
-            if (currentSet === exercise.sets) {
-                nextSetBtn.textContent = "Nächste Übung";
-                nextSetBtn.classList.remove("btn-success");
-                nextSetBtn.classList.add("btn-danger");
-            }
-            
-            alert("Weiter zum nächsten Satz!");
-            return;
-        }
+
+    // Timer nur starten, wenn nicht der letzte Satz war
+    if (currentSet < exercise.sets) {
+        let timeLeft = exercise.rest_time;
+        timerContainer.classList.remove("d-none");
         timerDisplay.textContent = formatTime(timeLeft);
-    }, 1000);
+        
+        if (currentTimer) {
+            clearInterval(currentTimer);
+        }
+        
+        currentTimer = setInterval(() => {
+            timeLeft--;
+            if (timeLeft < 0) {
+                clearInterval(currentTimer);
+                timerDisplay.textContent = "Pause beendet!";
+                alert("Weiter zum nächsten Satz!");
+                return;
+            }
+            timerDisplay.textContent = formatTime(timeLeft);
+        }, 1000);
+    }
 });
 
 async function saveProgress(exerciseName, weight) {
