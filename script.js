@@ -70,7 +70,7 @@ const nextExerciseBtn = document.getElementById("next-exercise-btn");
 // Neues Element für die Übungsnavigation
 const progressBar = document.createElement("div");
 progressBar.id = "exercise-progress";
-progressBar.style.cssText = "font-size: 0.8em; margin-bottom: 5px; white-space: nowrap; overflow-x: auto;";
+progressBar.style.cssText = "font-size: 0.8em; white-space: nowrap; overflow-x: auto;";
 exerciseContainer.insertBefore(progressBar, exerciseName);
 
 function updateExerciseProgress() {
