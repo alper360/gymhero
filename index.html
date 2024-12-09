@@ -14,11 +14,26 @@
         .exercise-card { margin-top: 20px; }
         .list-group-item { margin-bottom: 5px; background-color: #f8f9fa; }
         .exercise-details { line-height: 1.5; }
+        #exercise-progress { 
+            font-size: 0.8em; 
+            margin-bottom: 10px; 
+            white-space: nowrap; 
+            overflow-x: auto;
+            padding: 5px;
+            color: #6c757d;
+        }
     </style>
 </head>
 <body class="container mt-3">
-    <h1 class="text-center mb-4">Workout Tracker</h1>
+    <h1 class="text-center mb-4">Login</h1>
+    <div class="mb-4">
+        <input type="email" class="form-control mb-2" placeholder="E-Mail">
+        <input type="password" class="form-control mb-2" placeholder="Passwort">
+        <button class="btn btn-primary">Einloggen</button>
+        <button class="btn btn-secondary">Registrieren</button>
+    </div>
 
+    <h1 class="text-center mb-4">Workout Tracker</h1>
     <div class="mb-4">
         <label for="training-day" class="form-label">Wähle deinen Trainingstag:</label>
         <select id="training-day" class="form-select">
@@ -32,6 +47,7 @@
     </div>
 
     <div id="exercise-container" class="card p-3 d-none exercise-card">
+        <div id="exercise-progress" class="small text-muted mb-3"></div>
         <h2 id="exercise-name" class="card-title"></h2>
         <div class="exercise-details">
             <strong>Sätze:</strong> <span id="total-sets"></span><br>
@@ -43,8 +59,11 @@
             <label for="weight-input" class="form-label">Gewicht (kg):</label>
             <input type="number" id="weight-input" class="form-control" placeholder="Gib das Gewicht ein">
         </div>
-
-        <button id="next-set-btn" class="btn btn-success mt-3">Satz abschließen</button>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <button id="prev-exercise-btn" class="btn btn-primary" style="width: 50px; height: 50px;">&lt;</button>
+            <button id="next-set-btn" class="btn btn-success">Satz abschließen</button>
+            <button id="next-exercise-btn" class="btn btn-primary" style="width: 50px; height: 50px;">&gt;</button>
+        </div>
     </div>
 
     <div id="timer-container" class="mt-4 text-center d-none">
