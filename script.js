@@ -65,6 +65,22 @@ const timerDisplay = document.getElementById("timer-display");
 const weightInput = document.getElementById("weight-input");
 const progressList = document.getElementById("progress-list");
 
+// Neues Element für die Übungsnavigation
+const progressBar = document.createElement("div");
+progressBar.id = "exercise-progress";
+progressBar.style.cssText = "font-size: 0.8em; margin-bottom: 10px; white-space: nowrap; overflow-x: auto;";
+exerciseContainer.insertBefore(progressBar, exerciseName);
+
+function updateExerciseProgress() {
+    const progressBar = document.getElementById("exercise-progress");
+    progressBar.innerHTML = currentTrainingDay.map((exercise, index) => {
+        if (index === currentExerciseIndex) {
+            return `<strong>${exercise.name}</strong>`;
+        }
+        return exercise.name;
+    }).join(" > ");
+}
+
 document.getElementById("training-day").addEventListener("change", updateProgressList);
 
 document.getElementById("start-training").addEventListener("click", () => {
@@ -103,6 +119,7 @@ function nextExercise() {
     nextSetBtn.textContent = "Satz abschliessen";
     nextSetBtn.classList.remove("btn-danger");
     nextSetBtn.classList.add("btn-success");
+    updateExerciseProgress();
 }
 
 nextSetBtn.addEventListener("click", () => {
@@ -134,7 +151,7 @@ nextSetBtn.addEventListener("click", () => {
             if (timeLeft < 0) {
                 clearInterval(currentTimer);
                 timerDisplay.textContent = "Pause beendet!";
-                currentTimer = null;  // Timer zurücksetzen
+                currentTimer = null;
                 return;
             }
             timerDisplay.textContent = formatTime(timeLeft);
