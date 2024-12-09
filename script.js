@@ -1,3 +1,19 @@
+// Firebase Konfiguration
+const firebaseConfig = {
+    apiKey: "AIzaSyCcHR9c7AR3V--lAJVyAWBEThAc0ffG3O4",
+    authDomain: "gymhero-abee7.firebaseapp.com",
+    projectId: "gymhero-abee7",
+    storageBucket: "gymhero-abee7.firebasestorage.app",
+    messagingSenderId: "1008301754178",
+    appId: "1:1008301754178:web:9b84bd3d485a3455f96adb"
+};
+
+// Firebase initialisieren
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let currentTimer = null;
+
 const trainingDays = {
     Push: [
         { name: "Bankdrücken (KH)", sets: 3, reps: "8", rest_time: 120 },
@@ -36,10 +52,8 @@ const trainingDays = {
 let currentTrainingDay = [];
 let currentExerciseIndex = -1;
 let currentSet = 0;
-let currentTimer = null;
 let trackedWeights = { entries: [] };
 
-// DOM-Elemente
 const exerciseContainer = document.getElementById("exercise-container");
 const exerciseName = document.getElementById("exercise-name");
 const totalSets = document.getElementById("total-sets");
@@ -91,7 +105,8 @@ function nextExercise() {
     weightInput.value = getLastWeight(exercise.name);
     timerContainer.classList.add("d-none");
     
-    nextSetBtn.textContent = "Satz abschließen";
+    // Button Text zurücksetzen
+    nextSetBtn.textContent = "Satz abschliessen";
     nextSetBtn.classList.remove("btn-danger");
     nextSetBtn.classList.add("btn-success");
 }
@@ -108,12 +123,14 @@ nextSetBtn.addEventListener("click", () => {
     currentSet++;
     currentSetDisplay.textContent = currentSet;
     
+    // Button Text und Style für letzten Satz ändern
     if (currentSet === exercise.sets) {
         nextSetBtn.textContent = "Nächste Übung";
         nextSetBtn.classList.remove("btn-success");
         nextSetBtn.classList.add("btn-danger");
     }
 
+    // Timer nur starten, wenn nicht der letzte Satz war
     if (currentSet < exercise.sets) {
         let timeLeft = exercise.rest_time;
         timerContainer.classList.remove("d-none");
@@ -136,7 +153,7 @@ nextSetBtn.addEventListener("click", () => {
     }
 });
 
-function saveProgress(exerciseName, weight) {
+async function saveProgress(exerciseName, weight) {
     const currentDate = new Date();
     const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
     const formattedDate = `${days[currentDate.getDay()]}, ${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear().toString().slice(-2)}`;
@@ -149,20 +166,31 @@ function saveProgress(exerciseName, weight) {
         id: Date.now()
     };
     
-    if (!trackedWeights.entries) {
-        trackedWeights.entries = [];
-    }
-    
     trackedWeights.entries.unshift(entry);
-    localStorage.setItem('trackedWeights', JSON.stringify(trackedWeights));
-    updateProgressList();
+    
+    try {
+        await db.collection('workouts').doc('user1').set({
+            trackedWeights: trackedWeights,
+            lastUpdated: new Date()
+        });
+        updateProgressList();
+    } catch (error) {
+        console.error("Fehler beim Speichern:", error);
+    }
 }
 
-function loadProgress() {
-    const saved = localStorage.getItem('trackedWeights');
-    if (saved) {
-        trackedWeights = JSON.parse(saved);
-        updateProgressList();
+async function loadProgress() {
+    try {
+        const doc = await db.collection('workouts').doc('user1').get();
+        if (doc.exists) {
+            trackedWeights = doc.data().trackedWeights;
+            if (!trackedWeights.entries) {
+                trackedWeights.entries = [];
+            }
+            updateProgressList();
+        }
+    } catch (error) {
+        console.error("Fehler beim Laden:", error);
     }
 }
 
@@ -195,10 +223,17 @@ function updateProgressList() {
         });
 }
 
-function deleteEntry(id) {
+async function deleteEntry(id) {
     trackedWeights.entries = trackedWeights.entries.filter(entry => entry.id !== id);
-    localStorage.setItem('trackedWeights', JSON.stringify(trackedWeights));
-    updateProgressList();
+    try {
+        await db.collection('workouts').doc('user1').set({
+            trackedWeights: trackedWeights,
+            lastUpdated: new Date()
+        });
+        updateProgressList();
+    } catch (error) {
+        console.error("Fehler beim Löschen:", error);
+    }
 }
 
 function getLastWeight(exerciseName) {
