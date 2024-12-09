@@ -12,11 +12,11 @@
         .current-set { font-weight: bold; color: #007bff; }
         #timer-display { font-size: 3rem; font-weight: bold; }
         .exercise-card { margin-top: 20px; }
-        .exercise-details p {
-                        margin-bottom: 0.3rem;
-                       line-height: 1.2;
-                            }
         .list-group-item { margin-bottom: 5px; background-color: #f8f9fa; }
+        .exercise-details p {
+            margin-bottom: 0.3rem;
+            line-height: 1.2;
+        }
     </style>
 </head>
 <body class="container mt-3">
@@ -36,17 +36,18 @@
 
     <div id="exercise-container" class="card p-3 d-none exercise-card">
         <h2 id="exercise-name" class="card-title"></h2>
-        <p><strong>Sätze:</strong> <span id="total-sets"></span></p>
-        <p><strong>Wiederholungen:</strong> <span id="reps"></span></p>
-        <p><strong>Satzpause:</strong> <span id="rest-time"></span></p>
-        <p><strong>Aktueller Satz:</strong> <span id="current-set" class="current-set"></span></p>
-
+        <div class="exercise-details">
+            <p><strong>Sätze:</strong> <span id="total-sets"></span></p>
+            <p><strong>Wiederholungen:</strong> <span id="reps"></span></p>
+            <p><strong>Satzpause:</strong> <span id="rest-time"></span></p>
+            <h3><p></h3><strong>Aktueller Satz:</strong> <span id="current-set" class="current-set"></span></p></h3>
+        </div>
         <div class="mb-3">
             <label for="weight-input" class="form-label">Gewicht (kg):</label>
             <input type="number" id="weight-input" class="form-control" placeholder="Gib das Gewicht ein">
         </div>
 
-        <button id="next-set-btn" class="btn btn-success mt-3">Nächster Satz</button>
+        <button id="next-set-btn" class="btn btn-success mt-3">Satz abschließen</button>
     </div>
 
     <div id="timer-container" class="mt-4 text-center d-none">
