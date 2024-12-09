@@ -11,82 +11,8 @@ const firebaseConfig = {
 // Firebase initialisieren
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const auth = firebase.auth();
 
-let currentUser = null;
 let currentTimer = null;
-let currentTrainingDay = [];
-let currentExerciseIndex = -1;
-let currentSet = 0;
-let trackedWeights = { entries: [] };
-
-// DOM Elemente
-const loginContainer = document.getElementById("login-container");
-const mainContent = document.getElementById("main-content");
-const exerciseContainer = document.getElementById("exercise-container");
-const exerciseName = document.getElementById("exercise-name");
-const totalSets = document.getElementById("total-sets");
-const reps = document.getElementById("reps");
-const restTime = document.getElementById("rest-time");
-const currentSetDisplay = document.getElementById("current-set");
-const nextSetBtn = document.getElementById("next-set-btn");
-const timerContainer = document.getElementById("timer-container");
-const timerDisplay = document.getElementById("timer-display");
-const weightInput = document.getElementById("weight-input");
-const progressList = document.getElementById("progress-list");
-
-// Verstecke den Hauptinhalt initial
-mainContent.style.display = "none";
-
-// Login-Formular Handler
-document.getElementById("login-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    
-    try {
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        console.log("Erfolgreich eingeloggt:", userCredential.user.email);
-    } catch (error) {
-        alert("Login fehlgeschlagen: " + error.message);
-    }
-});
-
-// Registrierungs-Handler
-document.getElementById("register-btn").addEventListener("click", async () => {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    
-    if (password.length < 6) {
-        alert("Das Passwort muss mindestens 6 Zeichen lang sein");
-        return;
-    }
-    
-    try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        console.log("Erfolgreich registriert:", userCredential.user.email);
-    } catch (error) {
-        if (error.code === 'auth/email-already-in-use') {
-            alert("Diese E-Mail-Adresse wird bereits verwendet");
-        } else {
-            alert("Registrierung fehlgeschlagen: " + error.message);
-        }
-    }
-});
-
-// Auth-Status Observer
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        currentUser = user;
-        loginContainer.style.display = "none";
-        mainContent.style.display = "block";
-        loadProgress();
-    } else {
-        currentUser = null;
-        loginContainer.style.display = "block";
-        mainContent.style.display = "none";
-    }
-});
 
 const trainingDays = {
     Push: [
@@ -122,6 +48,23 @@ const trainingDays = {
         { name: "Hammer Curls", sets: 3, reps: "10", rest_time: 90 }
     ]
 };
+
+let currentTrainingDay = [];
+let currentExerciseIndex = -1;
+let currentSet = 0;
+let trackedWeights = { entries: [] };
+
+const exerciseContainer = document.getElementById("exercise-container");
+const exerciseName = document.getElementById("exercise-name");
+const totalSets = document.getElementById("total-sets");
+const reps = document.getElementById("reps");
+const restTime = document.getElementById("rest-time");
+const currentSetDisplay = document.getElementById("current-set");
+const nextSetBtn = document.getElementById("next-set-btn");
+const timerContainer = document.getElementById("timer-container");
+const timerDisplay = document.getElementById("timer-display");
+const weightInput = document.getElementById("weight-input");
+const progressList = document.getElementById("progress-list");
 
 document.getElementById("training-day").addEventListener("change", updateProgressList);
 
@@ -161,27 +104,33 @@ function nextExercise() {
     currentSetDisplay.textContent = currentSet;
     weightInput.value = getLastWeight(exercise.name);
     timerContainer.classList.add("d-none");
-    nextSetBtn.textContent = "Satz abschließen";
+    
+    // Button Text zurücksetzen
+    nextSetBtn.textContent = "Satz abschliessen";
     nextSetBtn.classList.remove("btn-danger");
     nextSetBtn.classList.add("btn-success");
 }
 
 nextSetBtn.addEventListener("click", () => {
     const exercise = currentTrainingDay[currentExerciseIndex];
+    
     if (currentSet >= exercise.sets) {
+        alert("Übung abgeschlossen!");
         nextExercise();
         return;
     }
 
     currentSet++;
     currentSetDisplay.textContent = currentSet;
-
+    
+    // Button Text und Style für letzten Satz ändern
     if (currentSet === exercise.sets) {
         nextSetBtn.textContent = "Nächste Übung";
         nextSetBtn.classList.remove("btn-success");
         nextSetBtn.classList.add("btn-danger");
     }
 
+    // Timer nur starten, wenn nicht der letzte Satz war
     if (currentSet < exercise.sets) {
         let timeLeft = exercise.rest_time;
         timerContainer.classList.remove("d-none");
@@ -190,7 +139,7 @@ nextSetBtn.addEventListener("click", () => {
         if (currentTimer) {
             clearInterval(currentTimer);
         }
-
+        
         currentTimer = setInterval(() => {
             timeLeft--;
             if (timeLeft < 0) {
@@ -205,8 +154,6 @@ nextSetBtn.addEventListener("click", () => {
 });
 
 async function saveProgress(exerciseName, weight) {
-    if (!currentUser) return;
-
     const currentDate = new Date();
     const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
     const formattedDate = `${days[currentDate.getDay()]}, ${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear().toString().slice(-2)}`;
@@ -218,11 +165,11 @@ async function saveProgress(exerciseName, weight) {
         weight: weight,
         id: Date.now()
     };
-
+    
     trackedWeights.entries.unshift(entry);
-
+    
     try {
-        await db.collection('workouts').doc(currentUser.uid).set({
+        await db.collection('workouts').doc('user1').set({
             trackedWeights: trackedWeights,
             lastUpdated: new Date()
         });
@@ -233,7 +180,75 @@ async function saveProgress(exerciseName, weight) {
 }
 
 async function loadProgress() {
-    if (!currentUser) return;
-
     try {
-        const doc = await db.collection('work
+        const doc = await db.collection('workouts').doc('user1').get();
+        if (doc.exists) {
+            trackedWeights = doc.data().trackedWeights;
+            if (!trackedWeights.entries) {
+                trackedWeights.entries = [];
+            }
+            updateProgressList();
+        }
+    } catch (error) {
+        console.error("Fehler beim Laden:", error);
+    }
+}
+
+function updateProgressList() {
+    const selectedDay = document.getElementById("training-day").value;
+    progressList.innerHTML = "";
+    
+    if (!selectedDay) return;
+    
+    trackedWeights.entries
+        .filter(entry => entry.trainingDay === selectedDay)
+        .forEach(entry => {
+            const listItem = document.createElement("li");
+            listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            
+            const contentDiv = document.createElement("div");
+            contentDiv.innerHTML = `
+                <strong>${entry.date}</strong><br>
+                ${entry.exercise}: ${entry.weight}${entry.weight !== '- kg' ? ' kg' : ''}
+            `;
+            
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "btn btn-danger btn-sm";
+            deleteButton.innerHTML = "×";
+            deleteButton.onclick = () => deleteEntry(entry.id);
+            
+            listItem.appendChild(contentDiv);
+            listItem.appendChild(deleteButton);
+            progressList.appendChild(listItem);
+        });
+}
+
+async function deleteEntry(id) {
+    trackedWeights.entries = trackedWeights.entries.filter(entry => entry.id !== id);
+    try {
+        await db.collection('workouts').doc('user1').set({
+            trackedWeights: trackedWeights,
+            lastUpdated: new Date()
+        });
+        updateProgressList();
+    } catch (error) {
+        console.error("Fehler beim Löschen:", error);
+    }
+}
+
+function getLastWeight(exerciseName) {
+    const selectedDay = document.getElementById("training-day").value;
+    const lastEntry = trackedWeights.entries
+        .filter(entry => entry.trainingDay === selectedDay && entry.exercise === exerciseName)[0];
+    return lastEntry ? lastEntry.weight : "- kg";
+}
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadProgress();
+});
