@@ -156,11 +156,15 @@ nextSetBtn.addEventListener("click", () => {
 async function saveProgress(exerciseName, weight) {
     const currentDate = new Date();
     const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+    const hours = currentDate.getHours().toString().padStart(2, '0');
+    const minutes = currentDate.getMinutes().toString().padStart(2, '0');
+    const timeString = `${hours}:${minutes}`;
     const formattedDate = `${days[currentDate.getDay()]}, ${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear().toString().slice(-2)}`;
     
     const entry = {
         trainingDay: document.getElementById("training-day").value,
         date: formattedDate,
+        time: timeString,
         exercise: exerciseName,
         weight: weight,
         id: Date.now()
@@ -197,7 +201,6 @@ async function loadProgress() {
 function updateProgressList() {
     const selectedDay = document.getElementById("training-day").value;
     progressList.innerHTML = "";
-    
     if (!selectedDay) return;
     
     trackedWeights.entries
@@ -205,10 +208,9 @@ function updateProgressList() {
         .forEach(entry => {
             const listItem = document.createElement("li");
             listItem.className = "list-group-item d-flex justify-content-between align-items-center";
-            
             const contentDiv = document.createElement("div");
             contentDiv.innerHTML = `
-                <strong>${entry.date}</strong><br>
+                ${entry.date} ${entry.time} Uhr<br>
                 ${entry.exercise}: ${entry.weight}${entry.weight !== '- kg' ? ' kg' : ''}
             `;
             
