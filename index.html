@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workout Tracker</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <!-- Firebase Module Imports -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -15,6 +14,7 @@
         .current-set { font-weight: bold; color: #007bff; }
         #timer-display { font-size: 3rem; font-weight: bold; }
         .exercise-card { margin-top: 20px; }
+        .list-group-item { margin-bottom: 5px; background-color: #f8f9fa; }
     </style>
 </head>
 <body class="container mt-3">
