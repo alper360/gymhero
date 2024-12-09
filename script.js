@@ -169,35 +169,35 @@ nextSetBtn.addEventListener("click", () => {
     currentSet++;
     currentSetDisplay.textContent = currentSet;
 
+    // Entferne die Bedingung, die den Timer ausblenden würde
+    let timeLeft = exercise.rest_time;
+    timerContainer.classList.remove("d-none");
+    timerDisplay.textContent = formatTime(timeLeft);
+    
+    if (currentTimer) {
+        clearInterval(currentTimer);
+    }
+    
+    currentTimer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft < 0) {
+            clearInterval(currentTimer);
+            timerDisplay.textContent = "Pause beendet!";
+            currentTimer = null;
+            return;
+        }
+        timerDisplay.textContent = formatTime(timeLeft);
+    }, 1000);
+
+    // Ändern des Button-Stils nur für den letzten Satz
     if (currentSet === exercise.sets) {
         nextSetBtn.textContent = "Nächste Übung";
         nextSetBtn.classList.remove("btn-success");
         nextSetBtn.classList.add("btn-danger");
-    }
-
-    // Timer für JEDEN Satz außer dem letzten Satz
-    if (currentSet < exercise.sets) {
-        let timeLeft = exercise.rest_time;
-        timerContainer.classList.remove("d-none");
-        timerDisplay.textContent = formatTime(timeLeft);
-        
-        if (currentTimer) {
-            clearInterval(currentTimer);
-        }
-        
-        currentTimer = setInterval(() => {
-            timeLeft--;
-            if (timeLeft < 0) {
-                clearInterval(currentTimer);
-                timerDisplay.textContent = "Pause beendet!";
-                currentTimer = null;
-                return;
-            }
-            timerDisplay.textContent = formatTime(timeLeft);
-        }, 1000);
     } else {
-        // Letzter Satz: Timer ausblenden
-        timerContainer.classList.add("d-none");
+        nextSetBtn.textContent = "Satz abschliessen";
+        nextSetBtn.classList.remove("btn-danger");
+        nextSetBtn.classList.add("btn-success");
     }
 });
 
