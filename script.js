@@ -66,6 +66,9 @@ const timerDisplay = document.getElementById("timer-display");
 const weightInput = document.getElementById("weight-input");
 const progressList = document.getElementById("progress-list");
 
+// Event Listener für Trainingstag-Änderung
+document.getElementById("training-day").addEventListener("change", updateProgressList);
+
 document.getElementById("start-training").addEventListener("click", () => {
     const selectedDay = document.getElementById("training-day").value;
     if (!trainingDays[selectedDay]) {
@@ -176,26 +179,32 @@ async function loadProgress() {
 }
 
 function updateProgressList() {
+    const selectedDay = document.getElementById("training-day").value;
     progressList.innerHTML = "";
-    trackedWeights.entries.forEach(entry => {
-        const listItem = document.createElement("li");
-        listItem.className = "list-group-item d-flex justify-content-between align-items-center";
-        
-        const contentDiv = document.createElement("div");
-        contentDiv.innerHTML = `
-            <strong>${entry.trainingDay}</strong> - ${entry.date}<br>
-            ${entry.exercise}: ${entry.weight}
-        `;
-        
-        const deleteButton = document.createElement("button");
-        deleteButton.className = "btn btn-danger btn-sm";
-        deleteButton.innerHTML = "×";
-        deleteButton.onclick = () => deleteEntry(entry.id);
-        
-        listItem.appendChild(contentDiv);
-        listItem.appendChild(deleteButton);
-        progressList.appendChild(listItem);
-    });
+    
+    if (!selectedDay) return;
+    
+    trackedWeights.entries
+        .filter(entry => entry.trainingDay === selectedDay)
+        .forEach(entry => {
+            const listItem = document.createElement("li");
+            listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            
+            const contentDiv = document.createElement("div");
+            contentDiv.innerHTML = `
+                <strong>${entry.date}</strong><br>
+                ${entry.exercise}: ${entry.weight}
+            `;
+            
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "btn btn-danger btn-sm";
+            deleteButton.innerHTML = "×";
+            deleteButton.onclick = () => deleteEntry(entry.id);
+            
+            listItem.appendChild(contentDiv);
+            listItem.appendChild(deleteButton);
+            progressList.appendChild(listItem);
+        });
 }
 
 async function deleteEntry(id) {
@@ -212,7 +221,9 @@ async function deleteEntry(id) {
 }
 
 function getLastWeight(exerciseName) {
-    const lastEntry = trackedWeights.entries.find(entry => entry.exercise === exerciseName);
+    const selectedDay = document.getElementById("training-day").value;
+    const lastEntry = trackedWeights.entries
+        .filter(entry => entry.trainingDay === selectedDay && entry.exercise === exerciseName)[0];
     return lastEntry ? lastEntry.weight : "- kg";
 }
 
