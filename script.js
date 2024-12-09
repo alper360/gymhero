@@ -20,7 +20,7 @@ let currentExerciseIndex = -1;
 let currentSet = 0;
 let trackedWeights = { entries: [] };
 
-// Login-Container und Hauptinhalt
+// DOM Elemente
 const loginContainer = document.getElementById("login-container");
 const mainContent = document.getElementById("main-content");
 const exerciseContainer = document.getElementById("exercise-container");
@@ -45,7 +45,8 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     const password = document.getElementById("password").value;
     
     try {
-        await auth.signInWithEmailAndPassword(email, password);
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        console.log("Erfolgreich eingeloggt:", userCredential.user.email);
     } catch (error) {
         alert("Login fehlgeschlagen: " + error.message);
     }
@@ -56,10 +57,20 @@ document.getElementById("register-btn").addEventListener("click", async () => {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     
+    if (password.length < 6) {
+        alert("Das Passwort muss mindestens 6 Zeichen lang sein");
+        return;
+    }
+    
     try {
-        await auth.createUserWithEmailAndPassword(email, password);
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        console.log("Erfolgreich registriert:", userCredential.user.email);
     } catch (error) {
-        alert("Registrierung fehlgeschlagen: " + error.message);
+        if (error.code === 'auth/email-already-in-use') {
+            alert("Diese E-Mail-Adresse wird bereits verwendet");
+        } else {
+            alert("Registrierung fehlgeschlagen: " + error.message);
+        }
     }
 });
 
@@ -225,20 +236,4 @@ async function loadProgress() {
     if (!currentUser) return;
 
     try {
-        const doc = await db.collection('workouts').doc(currentUser.uid).get();
-        if (doc.exists) {
-            trackedWeights = doc.data().trackedWeights;
-            if (!trackedWeights.entries) {
-                trackedWeights.entries = [];
-            }
-        }
-        updateProgressList();
-    } catch (error) {
-        console.error("Fehler beim Laden:", error);
-    }
-}
-
-function updateProgressList() {
-    const selectedDay = document.getElementById("training-day").value;
-    progressList.innerHTML = "";
-    if (!selectedDay
+        const doc = await db.collection('work
