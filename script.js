@@ -124,14 +124,17 @@ nextSetBtn.addEventListener("click", () => {
         let timeLeft = exercise.rest_time;
         timerContainer.classList.remove("d-none");
         timerDisplay.textContent = formatTime(timeLeft);
+        
         if (currentTimer) {
             clearInterval(currentTimer);
         }
+        
         currentTimer = setInterval(() => {
             timeLeft--;
             if (timeLeft < 0) {
                 clearInterval(currentTimer);
                 timerDisplay.textContent = "Pause beendet!";
+                currentTimer = null;  // Timer zurücksetzen
                 return;
             }
             timerDisplay.textContent = formatTime(timeLeft);
