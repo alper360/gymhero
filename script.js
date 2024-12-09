@@ -1,16 +1,17 @@
-// Firebase Konfiguration 
-const firebaseConfig = { 
-    apiKey: "AIzaSyCcHR9c7AR3V--lAJVyAWBEThAc0ffG3O4", 
-    authDomain: "gymhero-abee7.firebaseapp.com", 
-    projectId: "gymhero-abee7", 
-    storageBucket: "gymhero-abee7.firebasestorage.app", 
-    messagingSenderId: "1008301754178", 
-    appId: "1:1008301754178:web:9b84bd3d485a3455f96adb" 
-}; 
+// Firebase Konfiguration
+const firebaseConfig = {
+    apiKey: "AIzaSyCcHR9c7AR3V--lAJVyAWBEThAc0ffG3O4",
+    authDomain: "gymhero-abee7.firebaseapp.com",
+    projectId: "gymhero-abee7",
+    storageBucket: "gymhero-abee7.firebasestorage.app",
+    messagingSenderId: "1008301754178",
+    appId: "1:1008301754178:web:9b84bd3d485a3455f96adb"
+};
 
 // Firebase initialisieren
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
 let currentTimer = null;
 
 const trainingDays = {
@@ -67,7 +68,6 @@ const progressList = document.getElementById("progress-list");
 const prevExerciseBtn = document.getElementById("prev-exercise-btn");
 const nextExerciseBtn = document.getElementById("next-exercise-btn");
 
-// Neues Element für die Übungsnavigation
 const progressBar = document.createElement("div");
 progressBar.id = "exercise-progress";
 progressBar.style.cssText = "font-size: 0.8em; margin-bottom: 10px; white-space: nowrap; overflow-x: auto;";
@@ -91,6 +91,7 @@ document.getElementById("start-training").addEventListener("click", () => {
         alert("Bitte wähle einen gültigen Trainingstag aus!");
         return;
     }
+    
     currentTrainingDay = trainingDays[selectedDay];
     currentExerciseIndex = -1;
     currentSet = 0;
@@ -109,7 +110,7 @@ prevExerciseBtn.addEventListener("click", () => {
         restTime.textContent = `${exercise.rest_time} Sekunden`;
         currentSetDisplay.textContent = currentSet;
         weightInput.value = getLastWeight(exercise.name);
-        nextSetBtn.textContent = "Satz abschliessen";
+        nextSetBtn.textContent = "Satz abschließen";
         nextSetBtn.classList.remove("btn-danger");
         nextSetBtn.classList.add("btn-success");
         updateExerciseProgress();
@@ -127,7 +128,7 @@ nextExerciseBtn.addEventListener("click", () => {
         restTime.textContent = `${exercise.rest_time} Sekunden`;
         currentSetDisplay.textContent = currentSet;
         weightInput.value = getLastWeight(exercise.name);
-        nextSetBtn.textContent = "Satz abschliessen";
+        nextSetBtn.textContent = "Satz abschließen";
         nextSetBtn.classList.remove("btn-danger");
         nextSetBtn.classList.add("btn-success");
         updateExerciseProgress();
@@ -139,12 +140,14 @@ function nextExercise() {
         const currentExerciseName = currentTrainingDay[currentExerciseIndex].name;
         saveProgress(currentExerciseName, weightInput.value || "- kg");
     }
+
     currentExerciseIndex++;
     if (currentExerciseIndex >= currentTrainingDay.length) {
         exerciseContainer.classList.add("d-none");
         timerContainer.classList.add("d-none");
         return;
     }
+
     const exercise = currentTrainingDay[currentExerciseIndex];
     exerciseName.textContent = exercise.name;
     totalSets.textContent = exercise.sets;
@@ -154,7 +157,7 @@ function nextExercise() {
     currentSetDisplay.textContent = currentSet;
     weightInput.value = getLastWeight(exercise.name);
     timerContainer.classList.add("d-none");
-    nextSetBtn.textContent = "Satz abschliessen";
+    nextSetBtn.textContent = "Satz abschließen";
     nextSetBtn.classList.remove("btn-danger");
     nextSetBtn.classList.add("btn-success");
     updateExerciseProgress();
@@ -166,9 +169,9 @@ nextSetBtn.addEventListener("click", () => {
         nextExercise();
         return;
     }
+
     currentSet++;
     currentSetDisplay.textContent = currentSet;
-
     if (currentSet === exercise.sets) {
         nextSetBtn.textContent = "Nächste Übung";
         nextSetBtn.classList.remove("btn-success");
@@ -184,7 +187,7 @@ nextSetBtn.addEventListener("click", () => {
             clearInterval(currentTimer);
             currentTimer = null;
         }
-        
+
         currentTimer = setInterval(() => {
             timeLeft--;
             if (timeLeft < 0) {
@@ -196,10 +199,8 @@ nextSetBtn.addEventListener("click", () => {
             timerDisplay.textContent = formatTime(timeLeft);
         }, 1000);
     } else {
-        // Timer ausblenden wenn letzter Satz erreicht
         timerContainer.classList.add("d-none");
     }
-});
 });
 
 async function saveProgress(exerciseName, weight) {
@@ -240,8 +241,8 @@ async function loadProgress() {
             if (!trackedWeights.entries) {
                 trackedWeights.entries = [];
             }
-            updateProgressList();
         }
+        updateProgressList();
     } catch (error) {
         console.error("Fehler beim Laden:", error);
     }
@@ -257,18 +258,15 @@ function updateProgressList() {
         .forEach(entry => {
             const listItem = document.createElement("li");
             listItem.className = "list-group-item d-flex justify-content-between align-items-center";
-            
             const contentDiv = document.createElement("div");
             contentDiv.innerHTML = `
                 ${entry.date} - ${entry.time} Uhr<br>
                 ${entry.exercise}: ${entry.weight}${entry.weight !== '- kg' ? ' kg' : ''}
             `;
-
             const deleteButton = document.createElement("button");
             deleteButton.className = "btn btn-danger btn-sm";
             deleteButton.innerHTML = "×";
             deleteButton.onclick = () => deleteEntry(entry.id);
-
             listItem.appendChild(contentDiv);
             listItem.appendChild(deleteButton);
             progressList.appendChild(listItem);
