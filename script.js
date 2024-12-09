@@ -100,7 +100,6 @@ document.getElementById("start-training").addEventListener("click", () => {
 
 prevExerciseBtn.addEventListener("click", () => {
     if (currentExerciseIndex > 0) {
-        saveProgress(currentTrainingDay[currentExerciseIndex].name, weightInput.value || "- kg");
         currentExerciseIndex--;
         currentSet = 1;
         const exercise = currentTrainingDay[currentExerciseIndex];
@@ -119,7 +118,6 @@ prevExerciseBtn.addEventListener("click", () => {
 
 nextExerciseBtn.addEventListener("click", () => {
     if (currentExerciseIndex < currentTrainingDay.length - 1) {
-        saveProgress(currentTrainingDay[currentExerciseIndex].name, weightInput.value || "- kg");
         currentExerciseIndex++;
         currentSet = 1;
         const exercise = currentTrainingDay[currentExerciseIndex];
