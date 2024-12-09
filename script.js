@@ -210,7 +210,7 @@ function updateProgressList() {
             listItem.className = "list-group-item d-flex justify-content-between align-items-center";
             const contentDiv = document.createElement("div");
             contentDiv.innerHTML = `
-                ${entry.date} ${entry.time} Uhr<br>
+                ${entry.date} - ${entry.time} Uhr<br>
                 ${entry.exercise}: ${entry.weight}${entry.weight !== '- kg' ? ' kg' : ''}
             `;
             
