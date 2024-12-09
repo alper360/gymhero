@@ -91,7 +91,6 @@ document.getElementById("start-training").addEventListener("click", () => {
         alert("Bitte wähle einen gültigen Trainingstag aus!");
         return;
     }
-    
     currentTrainingDay = trainingDays[selectedDay];
     currentExerciseIndex = -1;
     currentSet = 0;
