@@ -104,15 +104,31 @@ function nextExercise() {
     currentSetDisplay.textContent = currentSet;
     weightInput.value = getLastWeight(exercise.name);
     timerContainer.classList.add("d-none");
+    
+    // Button zurücksetzen
+    nextSetBtn.textContent = "Satz abschließen";
+    nextSetBtn.classList.remove("btn-danger");
+    nextSetBtn.classList.add("btn-success");
 }
 
 nextSetBtn.addEventListener("click", () => {
     const exercise = currentTrainingDay[currentExerciseIndex];
     
-    if (currentSet >= exercise.sets) {
+      if (currentSet >= exercise.sets) {
         alert("Übung abgeschlossen!");
         nextExercise();
         return;
+    }
+
+    // Prüfen ob nächster Satz der letzte sein wird
+    if (currentSet === exercise.sets - 1) {
+        nextSetBtn.textContent = "Nächste Übung";
+        nextSetBtn.classList.remove("btn-success");
+        nextSetBtn.classList.add("btn-danger");
+    } else {
+        nextSetBtn.textContent = "Satz abschließen";
+        nextSetBtn.classList.remove("btn-danger");
+        nextSetBtn.classList.add("btn-success");
     }
 
     // Timer starten nach Satzabschluss
