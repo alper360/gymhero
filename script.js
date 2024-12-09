@@ -83,19 +83,23 @@ function updateExerciseProgress() {
     }).join(" > ");
 }
 
-document.getElementById("training-day").addEventListener("change", updateProgressList);
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("training-day").addEventListener("change", updateProgressList);
+    
+    document.getElementById("start-training").addEventListener("click", () => {
+        const selectedDay = document.getElementById("training-day").value;
+        if (!trainingDays[selectedDay]) {
+            alert("Bitte wähle einen gültigen Trainingstag aus!");
+            return;
+        }
+        currentTrainingDay = trainingDays[selectedDay];
+        currentExerciseIndex = -1;
+        currentSet = 0;
+        nextExercise();
+        exerciseContainer.classList.remove("d-none");
+    });
 
-document.getElementById("start-training").addEventListener("click", () => {
-    const selectedDay = document.getElementById("training-day").value;
-    if (!trainingDays[selectedDay]) {
-        alert("Bitte wähle einen gültigen Trainingstag aus!");
-        return;
-    }
-    currentTrainingDay = trainingDays[selectedDay];
-    currentExerciseIndex = -1;
-    currentSet = 0;
-    nextExercise();
-    exerciseContainer.classList.remove("d-none");
+    loadProgress();
 });
 
 prevExerciseBtn.addEventListener("click", () => {
@@ -297,7 +301,3 @@ function formatTime(seconds) {
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-    loadProgress();
-});
