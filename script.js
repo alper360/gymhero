@@ -20,6 +20,7 @@ let currentExerciseIndex = -1;
 let currentSet = 0;
 let trackedWeights = { entries: [] };
 
+// Login-Container und Hauptinhalt
 const loginContainer = document.getElementById("login-container");
 const mainContent = document.getElementById("main-content");
 const exerciseContainer = document.getElementById("exercise-container");
@@ -36,41 +37,6 @@ const progressList = document.getElementById("progress-list");
 
 // Verstecke den Hauptinhalt initial
 mainContent.style.display = "none";
-
-const trainingDays = {
-    Push: [
-        { name: "Bankdrücken (KH)", sets: 3, reps: "8", rest_time: 120 },
-        { name: "Schrägbankdrücken (Multipresse)", sets: 3, reps: "10", rest_time: 120 },
-        { name: "Butterfly Kabelzug", sets: 3, reps: "10", rest_time: 120 },
-        { name: "Schulterdrücken (KH)", sets: 3, reps: "15", rest_time: 90 },
-        { name: "Seitheben (Kabelzug)", sets: 3, reps: "10", rest_time: 90 },
-        { name: "Dips", sets: 3, reps: "10", rest_time: 120 }
-    ],
-    Pull: [
-        { name: "Lat-Ziehen (Kabelzug)", sets: 3, reps: "10", rest_time: 180 },
-        { name: "Rudern (Kabelzug)", sets: 3, reps: "10", rest_time: 120 },
-        { name: "Überzüge (Maschine / Kabelzug)", sets: 3, reps: "10", rest_time: 120 },
-        { name: "Face Pulls (Kabelzug)", sets: 3, reps: "10", rest_time: 120 },
-        { name: "Reverse Butterfly (Kabelzug / Maschine)", sets: 3, reps: "10", rest_time: 120 },
-        { name: "Bizeps Curls (KH)", sets: 3, reps: "12", rest_time: 90 }
-    ],
-    UK: [
-        { name: "Kniebeugen (LH / Multipresse)", sets: 3, reps: "8", rest_time: 180 },
-        { name: "Beinstrecker", sets: 3, reps: "10", rest_time: 120 },
-        { name: "Beinbeuger", sets: 3, reps: "10", rest_time: 120 },
-        { name: "Ausfallschritte", sets: 3, reps: "10", rest_time: 120 },
-        { name: "Wadenheben", sets: 3, reps: "15", rest_time: 90 },
-        { name: "Bauch", sets: 3, reps: "10", rest_time: 60 }
-    ],
-    OK: [
-        { name: "Bankdrücken (LH)", sets: 4, reps: "10", rest_time: 120 },
-        { name: "Vorgebeugtes Rudern (LH)", sets: 4, reps: "10", rest_time: 120 },
-        { name: "Trizeps-Pushdowns (Kabelzug mit Stange)", sets: 3, reps: "10", rest_time: 120 },
-        { name: "Überkopf Trizepsdrücken (Kabelzug)", sets: 3, reps: "10", rest_time: 90 },
-        { name: "Scottcurls", sets: 3, reps: "10", rest_time: 90 },
-        { name: "Hammer Curls", sets: 3, reps: "10", rest_time: 90 }
-    ]
-};
 
 // Login-Formular Handler
 document.getElementById("login-form").addEventListener("submit", async (e) => {
@@ -111,6 +77,41 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
+const trainingDays = {
+    Push: [
+        { name: "Bankdrücken (KH)", sets: 3, reps: "8", rest_time: 120 },
+        { name: "Schrägbankdrücken (Multipresse)", sets: 3, reps: "10", rest_time: 120 },
+        { name: "Butterfly Kabelzug", sets: 3, reps: "10", rest_time: 120 },
+        { name: "Schulterdrücken (KH)", sets: 3, reps: "15", rest_time: 90 },
+        { name: "Seitheben (Kabelzug)", sets: 3, reps: "10", rest_time: 90 },
+        { name: "Dips", sets: 3, reps: "10", rest_time: 120 }
+    ],
+    Pull: [
+        { name: "Lat-Ziehen (Kabelzug)", sets: 3, reps: "10", rest_time: 180 },
+        { name: "Rudern (Kabelzug)", sets: 3, reps: "10", rest_time: 120 },
+        { name: "Überzüge (Maschine / Kabelzug)", sets: 3, reps: "10", rest_time: 120 },
+        { name: "Face Pulls (Kabelzug)", sets: 3, reps: "10", rest_time: 120 },
+        { name: "Reverse Butterfly (Kabelzug / Maschine)", sets: 3, reps: "10", rest_time: 120 },
+        { name: "Bizeps Curls (KH)", sets: 3, reps: "12", rest_time: 90 }
+    ],
+    UK: [
+        { name: "Kniebeugen (LH / Multipresse)", sets: 3, reps: "8", rest_time: 180 },
+        { name: "Beinstrecker", sets: 3, reps: "10", rest_time: 120 },
+        { name: "Beinbeuger", sets: 3, reps: "10", rest_time: 120 },
+        { name: "Ausfallschritte", sets: 3, reps: "10", rest_time: 120 },
+        { name: "Wadenheben", sets: 3, reps: "15", rest_time: 90 },
+        { name: "Bauch", sets: 3, reps: "10", rest_time: 60 }
+    ],
+    OK: [
+        { name: "Bankdrücken (LH)", sets: 4, reps: "10", rest_time: 120 },
+        { name: "Vorgebeugtes Rudern (LH)", sets: 4, reps: "10", rest_time: 120 },
+        { name: "Trizeps-Pushdowns (Kabelzug mit Stange)", sets: 3, reps: "10", rest_time: 120 },
+        { name: "Überkopf Trizepsdrücken (Kabelzug)", sets: 3, reps: "10", rest_time: 90 },
+        { name: "Scottcurls", sets: 3, reps: "10", rest_time: 90 },
+        { name: "Hammer Curls", sets: 3, reps: "10", rest_time: 90 }
+    ]
+};
+
 document.getElementById("training-day").addEventListener("change", updateProgressList);
 
 document.getElementById("start-training").addEventListener("click", () => {
@@ -149,6 +150,9 @@ function nextExercise() {
     currentSetDisplay.textContent = currentSet;
     weightInput.value = getLastWeight(exercise.name);
     timerContainer.classList.add("d-none");
+    nextSetBtn.textContent = "Satz abschließen";
+    nextSetBtn.classList.remove("btn-danger");
+    nextSetBtn.classList.add("btn-success");
 }
 
 nextSetBtn.addEventListener("click", () => {
@@ -237,10 +241,4 @@ async function loadProgress() {
 function updateProgressList() {
     const selectedDay = document.getElementById("training-day").value;
     progressList.innerHTML = "";
-    if (!selectedDay) return;
-
-    trackedWeights.entries
-        .filter(entry => entry.trainingDay === selectedDay)
-        .forEach(entry => {
-            const listItem = document.createElement("li");
-            listItem.className = "list-group-item
+    if (!selectedDay
