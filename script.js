@@ -1,4 +1,3 @@
-// Firebase Initialisierung
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -14,11 +13,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Vollständiger Trainingsplan
+let currentTimer = null;
+
 const trainingDays = {
     Push: [
-        { name: "Bankdrücken (KH)", sets: 3, reps: "8", weight: "25", rest_time: 120 },
-        { name: "Schrägbankdrücken (Multipresse)", sets: 3, reps: "10", weight: "20", rest_time: 120 },
+        { name: "Bankdrücken (KH)", sets: 3, reps: "8", rest_time: 120 },
+        { name: "Schrägbankdrücken (Multipresse)", sets: 3, reps: "10", rest_time: 120 },
         { name: "Butterfly Kabelzug", sets: 3, reps: "10", rest_time: 120 },
         { name: "Schulterdrücken (KH)", sets: 3, reps: "15", rest_time: 90 },
         { name: "Seitheben (Kabelzug)", sets: 3, reps: "10", rest_time: 90 },
@@ -50,13 +50,11 @@ const trainingDays = {
     ]
 };
 
-// Globale Variablen
 let currentTrainingDay = [];
 let currentExerciseIndex = -1;
 let currentSet = -1;
-let trackedWeights = {};
+let trackedWeights = { entries: [] };
 
-// DOM-Elemente
 const exerciseContainer = document.getElementById("exercise-container");
 const exerciseName = document.getElementById("exercise-name");
 const totalSets = document.getElementById("total-sets");
@@ -69,7 +67,6 @@ const timerDisplay = document.getElementById("timer-display");
 const weightInput = document.getElementById("weight-input");
 const progressList = document.getElementById("progress-list");
 
-// Event Listener für Trainingsstart
 document.getElementById("start-training").addEventListener("click", () => {
     const selectedDay = document.getElementById("training-day").value;
     if (!trainingDays[selectedDay]) {
@@ -83,13 +80,41 @@ document.getElementById("start-training").addEventListener("click", () => {
     exerciseContainer.classList.remove("d-none");
 });
 
-// Nächste Übung
+nextSetBtn.addEventListener("click", () => {
+    const exercise = currentTrainingDay[currentExerciseIndex];
+    if (currentSet >= exercise.sets) {
+        alert("Übung abgeschlossen!");
+        nextExercise();
+        return;
+    }
+
+    currentSet++;
+    currentSetDisplay.textContent = currentSet;
+    
+    timerContainer.classList.remove("d-none");
+    let timeLeft = exercise.rest_time;
+    timerDisplay.textContent = formatTime(timeLeft);
+    
+    if (currentTimer) {
+        clearInterval(currentTimer);
+    }
+    
+    currentTimer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft < 0) {
+            clearInterval(currentTimer);
+            timerDisplay.textContent = "Pause beendet!";
+            alert("Weiter zum nächsten Satz!");
+            return;
+        }
+        timerDisplay.textContent = formatTime(timeLeft);
+    }, 1000);
+});
+
 function nextExercise() {
     if (currentExerciseIndex >= 0) {
         const currentExerciseName = currentTrainingDay[currentExerciseIndex].name;
-        trackedWeights[currentExerciseName] = weightInput.value || "-";
-        saveProgress();
-        updateProgressList();
+        saveProgress(currentExerciseName, weightInput.value || "- kg");
     }
 
     currentExerciseIndex++;
@@ -107,43 +132,30 @@ function nextExercise() {
     restTime.textContent = `${exercise.rest_time} Sekunden`;
     currentSet = 1;
     currentSetDisplay.textContent = currentSet;
-    weightInput.value = trackedWeights[exercise.name] || "";
+    weightInput.value = getLastWeight(exercise.name);
 }
 
-// Event Listener für nächsten Satz
-nextSetBtn.addEventListener("click", () => {
-    const exercise = currentTrainingDay[currentExerciseIndex];
-    if (currentSet >= exercise.sets) {
-        alert("Übung abgeschlossen!");
-        nextExercise();
-        return;
-    }
-
-    currentSet++;
-    currentSetDisplay.textContent = currentSet;
-    let timeLeft = exercise.rest_time;
-    timerDisplay.textContent = formatTime(timeLeft);
-    timerContainer.classList.remove("d-none");
-
-    const timerInterval = setInterval(() => {
-        timeLeft--;
-        if (timeLeft <= -1) {
-            clearInterval(timerInterval);
-            timerDisplay.textContent = "Pause beendet!";
-            alert("Weiter zum nächsten Satz!");
-            return;
-        }
-        timerDisplay.textContent = formatTime(timeLeft);
-    }, 1000);
-});
-
-// Firebase Funktionen
-async function saveProgress() {
+async function saveProgress(exerciseName, weight) {
+    const currentDate = new Date();
+    const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+    const formattedDate = `${days[currentDate.getDay()]}, ${currentDate.getDate().toString().padStart(2, '0')}.${(currentDate.getMonth() + 1).toString().padStart(2, '0')}.${currentDate.getFullYear().toString().slice(-2)}`;
+    
+    const entry = {
+        trainingDay: document.getElementById("training-day").value,
+        date: formattedDate,
+        exercise: exerciseName,
+        weight: weight,
+        id: Date.now()
+    };
+    
+    trackedWeights.entries.unshift(entry);
+    
     try {
         await setDoc(doc(db, "workouts", "user1"), {
             trackedWeights: trackedWeights,
             lastUpdated: new Date()
         });
+        updateProgressList();
     } catch (error) {
         console.error("Fehler beim Speichern:", error);
     }
@@ -162,15 +174,42 @@ async function loadProgress() {
     }
 }
 
-// Hilfsfunktionen
 function updateProgressList() {
     progressList.innerHTML = "";
-    for (const [exercise, weight] of Object.entries(trackedWeights)) {
+    trackedWeights.entries.forEach(entry => {
         const listItem = document.createElement("li");
-        listItem.className = "list-group-item";
-        listItem.textContent = `${exercise}: ${weight} kg`;
+        listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+        
+        const contentDiv = document.createElement("div");
+        contentDiv.innerHTML = `
+            <strong>${entry.trainingDay}</strong> - ${entry.date}<br>
+            ${entry.exercise}: ${entry.weight}
+        `;
+        
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "btn btn-danger btn-sm";
+        deleteButton.innerHTML = "×";
+        deleteButton.onclick = () => deleteEntry(entry.id);
+        
+        listItem.appendChild(contentDiv);
+        listItem.appendChild(deleteButton);
         progressList.appendChild(listItem);
+    });
+}
+
+async function deleteEntry(id) {
+    trackedWeights.entries = trackedWeights.entries.filter(entry => entry.id !== id);
+    try {
+        await saveProgress();
+        updateProgressList();
+    } catch (error) {
+        console.error("Fehler beim Löschen:", error);
     }
+}
+
+function getLastWeight(exerciseName) {
+    const lastEntry = trackedWeights.entries.find(entry => entry.exercise === exerciseName);
+    return lastEntry ? lastEntry.weight : "- kg";
 }
 
 function formatTime(seconds) {
@@ -179,7 +218,6 @@ function formatTime(seconds) {
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
-// Initialisierung beim Laden
 document.addEventListener("DOMContentLoaded", () => {
     loadProgress();
 });
