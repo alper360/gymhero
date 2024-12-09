@@ -189,7 +189,7 @@ nextSetBtn.addEventListener("click", () => {
             if (timeLeft < 0) {
                 clearInterval(currentTimer);
                 timerDisplay.textContent = "Pause beendet!";
-                currentTimer = null;
+                currentTimer = null;  // Timer zurücksetzen
                 return;
             }
             timerDisplay.textContent = formatTime(timeLeft);
