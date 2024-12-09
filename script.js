@@ -105,7 +105,7 @@ function nextExercise() {
     weightInput.value = getLastWeight(exercise.name);
     timerContainer.classList.add("d-none");
     
-    // Button zurücksetzen
+    // Button Text zurücksetzen
     nextSetBtn.textContent = "Satz abschließen";
     nextSetBtn.classList.remove("btn-danger");
     nextSetBtn.classList.add("btn-success");
@@ -114,21 +114,10 @@ function nextExercise() {
 nextSetBtn.addEventListener("click", () => {
     const exercise = currentTrainingDay[currentExerciseIndex];
     
-      if (currentSet >= exercise.sets) {
+    if (currentSet >= exercise.sets) {
         alert("Übung abgeschlossen!");
         nextExercise();
         return;
-    }
-
-    // Prüfen ob nächster Satz der letzte sein wird
-    if (currentSet === exercise.sets - 1) {
-        nextSetBtn.textContent = "Nächste Übung";
-        nextSetBtn.classList.remove("btn-success");
-        nextSetBtn.classList.add("btn-danger");
-    } else {
-        nextSetBtn.textContent = "Satz abschließen";
-        nextSetBtn.classList.remove("btn-danger");
-        nextSetBtn.classList.add("btn-success");
     }
 
     // Timer starten nach Satzabschluss
@@ -147,6 +136,14 @@ nextSetBtn.addEventListener("click", () => {
             timerDisplay.textContent = "Pause beendet!";
             currentSet++;
             currentSetDisplay.textContent = currentSet;
+            
+            // Button Text und Style für letzten Satz ändern
+            if (currentSet === exercise.sets) {
+                nextSetBtn.textContent = "Nächste Übung";
+                nextSetBtn.classList.remove("btn-success");
+                nextSetBtn.classList.add("btn-danger");
+            }
+            
             alert("Weiter zum nächsten Satz!");
             return;
         }
